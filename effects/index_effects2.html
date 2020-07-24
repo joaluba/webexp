@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+    <!--This will be at the top of the page-->
+	<head>
+		<title>Joanna's third website</title>
+	</head>
+
+		<!--Here comes the content of the website-->
+		<body> 
+		
+		<!--Play button-->
+		<button id="playButton" type="button" onclick="playStopAudio()">
+  		Play
+  		</button>
+  		
+  		<!--Gain slider-->
+  		<label for="gain">GAIN:</label>
+        	<input type="range" id="gain" min="0.1" max="10" step="0.01" value="0.5" name="gain">
+        
+       		<!--Filter cuttoff slider-->
+        	<label for="cutoff">CUTTOF:</label>
+        	<input type="range" id="cutoff" min="100" max="12000" step="10" value="100" name="cutoff">
+        
+        	<!--Distortion slider-->
+        	<label for="dist">DIST:</label>
+       		<input type="range" id="dist" min="0" max="200" step="1"  value="0" name="dist">
+			
+	    	<!--------------------------------------------------->
+		<!--------------- JAVASCRIPT SCRIPTS ---------------->
+		<!--------------------------------------------------->
+		
+		<script>
+		///////////// HERE THE SCRIPT STARTS //////////////
+		
+		// button
+		var pButton = document.getElementById("playButton");
+		var click=0;
+		// sliders
+		var dist_slide = document.getElementById("dist");
+		var cutoff_slide = document.getElementById("cutoff");
+		var gain_slide = document.getElementById("gain");
+		
+		 //------------------------ WEB AUDIO API ---------------------------
+		// create audio context
+		var context = new (window.AudioContext || window.webkitAudioContext)();
+
+		// create source node and fill it with a sound (mp3 from internet)
+                var sourceNode = context.createBufferSource(); 
+    		var myBuf;
+		var getSound = new XMLHttpRequest();
+		getSound.open("GET", "https://freesound.org/data/previews/208/208520_2305278-lq.mp3", true);
+		getSound.responseType = "arraybuffer";
+		getSound.onload = function() {
+		context.decodeAudioData(getSound.response, function(buffer){
+		myBuf = buffer;
+		sourceNode.buffer=myBuf;
+		});
+		}
+		getSound.send();
+
+ 		// create distortion node and fill it with a distortion curve
+		var distNode = context.createWaveShaper();		
+
+			// function to create distortion curve 
+			function makeDistortionCurve(amount){
+			var k = typeof amount === 'number' ? amount : amount,
+			n_samples = 44100,curve = new Float32Array(n_samples),
+			deg = Math.PI / 180,i = 0,x;
+		  		for ( ; i < n_samples; ++i ) {
+				x = i * 2 / n_samples - 1;
+				curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+		  		}
+	  		return curve;
+			};
+
+		// create gain node 
+		var gainNode = context.createGain();
+		// create filter node
+		var filterNode = context.createBiquadFilter();
+		filterNode.type = "bandpass";
+		filterNode.gain.setValueAtTime(40, context.currentTime);
+		// connect the 'graph'
+		sourceNode.connect(filterNode);
+		filterNode.connect(distNode);
+		distNode.connect(gainNode)
+
+		//start playing the source
+                sourceNode.start(0);
+		// source is always running 'in the background'
+		sourceNode.loop=true;
+
+
+		// assign slider moves to audioNode parameters
+		dist_slide.oninput = function(){distNode.curve = makeDistortionCurve(dist_slide.value)};
+		gain_slide.oninput = function(){gainNode.gain.value = gain_slide.value};
+		cutoff_slide.oninput = function(){filterNode.frequency.setValueAtTime(cutoff_slide.value, context.currentTime)};
+
+
+  		const playStopAudio = function(){
+  		// check if context is in suspended state (autoplay policy)
+			if (context.state === 'suspended') {
+			context.resume();
+			}
+
+  		click = !click;
+  			if (click==1){
+  			// Button to display STOP
+  			pButton.innerHTML = "Stop";
+			// connect the last element in the graph (gain)
+			// with the destination (speakers)
+  			gainNode.connect(context.destination);
+  			}
+
+  			else{
+  			// Button to display PLAY
+  			pButton.innerHTML = "Play";
+			// disconnect the last element of the graph (gain)
+			// from the destination (speakers)
+  			gainNode.disconnect(context.destination);
+  			}
+  		}
+  		
+        </script>
+		
+		</body>
+
+</html>
+
+
+
+
+
+

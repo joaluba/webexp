@@ -1,0 +1,59 @@
+The Web Audio API is a high-level JavaScript Application Programming Interface (API) that can be used for processing and synthesizing audio in web applications. The audio processing is actually handled by Assembly/C/C++ code within the browser, but the API allows us to control it with JavaScript. 
+
+It allows for much more elaborated processing of sound than simple audi node. 
+Audio Context -> like a block diagram, everything is happening there from 
+source, through connections, to output destination. Audio Nodes - nodes of that diagram. 
+
+
+*** Writes about problems with audio tag:
+https://www.oreilly.com/library/view/web-audio-api/9781449332679/ch01.html
+
+*** Convolution architecture:
+https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/convolution.html
+
+*** Convolution tutorial Web API:
+https://middleearmedia.com/web-audio-api-convolver-node/
+
+
+*** Loading a file from url into a buffer 
+
+This method takes the ArrayBuffer of audio file data stored in request.response and decodes it asynchronously (not blocking the main JavaScript execution thread).
+(https://www.html5rocks.com/en/tutorials/webaudio/intro/)
+
+var dogBarkingBuffer = null;
+// Fix up prefixing
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var context = new AudioContext();
+
+function loadDogSound(url) {
+  var request = new XMLHttpRequest();
+  request.open('GET', url, true);
+  request.responseType = 'arraybuffer';
+
+  // Decode asynchronously
+  request.onload = function() {
+    context.decodeAudioData(request.response, function(buffer) {
+      dogBarkingBuffer = buffer;
+    }, onError);
+  }
+  request.send();
+}
+
+*** Buffer of audio in Web audio API
+https://middleearmedia.com/web-audio-api-audio-buffer/
+http://fourthof5.com/audio-visualisation-with-the-web-audio-api
+
+var getSound = new XMLHttpRequest();
+getSound.open("GET", "sounds/electro2.wav", true);
+getSound.responseType = "arraybuffer";
+getSound.onload = function() {
+context.decodeAudioData(getSound.response, function(buffer){
+electro = buffer;
+});
+}
+getSound.send();
+
+
+
+
+

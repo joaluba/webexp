@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+    <!--This will be at the top of the page-->
+	<head>
+		<title>Joanna's second website</title>
+	</head>
+
+		<!--Here comes the content of the website-->
+		<body> 
+		
+			<!---------------------------------------------------->
+			<!------------------ HTML ELEMENTS ------------------->
+			<!---------------------------------------------------->
+			
+			<!--Include image-->
+            <img id="im_exp" src="exp.png" width="400" 
+            style="position:absolute; left:0; top:0;" >
+            
+            <!--Add text-->
+			<p style="position:absolute; left:0px; top:160px;">
+			Listen to the cue, the trial and the probe and 
+			guess <br> if the probe came from the cued voice.
+			</p>
+	
+		    <!--Cue-->
+			<p style="position:absolute; left:20px; top:210px;">Cue:</p>
+			<audio id="cue" style="position:absolute; left:20px; top:250px;"  controls>
+			<source src="audio/cue1.wav" type="audio/wav">
+			</audio>
+			
+			<!--Trial-->
+			<p style="position:absolute; left:20px; top:310px;">Trial:</p>
+			<audio id="cue" style="position:absolute; left:20px; top:350px;"  controls>
+			<source src="audio/trial1.wav" type="audio/wav">
+			</audio>
+			
+			<!--Probe-->
+			<p style="position:absolute; left:20px; top:410px;">Probe:</p>
+			<audio id="cue" style="position:absolute; left:20px; top:450px;"  controls>
+			<source src="audio/probe1.wav" type="audio/wav">
+			</audio>
+			
+			<!--Include button-->
+			<button id="but_answ" onclick="clickfun()" 
+			type="button" style="position:absolute; left:450px; top:350px;">
+			Show correct answer</button>
+			
+			
+			<!--------------------------------------------------->
+			<!--------------- JAVASCRIPT SCRIPTS ---------------->
+			<!--------------------------------------------------->
+			
+			<!--There's no volume attribute supported by browsers
+			 so you must set the volume property in JavaScript--->
+			<script>
+			///////////// HERE THE SCRIPT STARTS //////////////
+            var audios = document.getElementsByTagName("audio");
+            audios[0].volume = 0.2;
+            audios[1].volume = 0.5;
+            audios[2].volume = 0.2;
+            </script>
+
+
+            <!--What to do on click-->
+			<script>
+			///////////// HERE THE SCRIPT STARTS //////////////
+			
+			//Create a 'button' variable
+  			var b = document.getElementById("but_answ");
+  			//Create a click state variable
+  			var click=0;
+  			//Create counter variables for later
+			var counter1=0;
+			var counter2=1;
+  			 
+			//Create space for an answer as a 'paragraph'
+			//HTLM element 
+			var p = document.createElement("p");
+			p.style.position="absolute";
+		    p.style.left="450px";
+			p.style.top="450px";
+			document.body.appendChild(p);
+		    //create an array with correct answers				
+			const answs=['YES, it did','NO, it did not'];
+			
+
+			// Function to define what happens on a click
+			function clickfun() {
+			
+    		//change the click state (on/off)	
+			click=!click;
+			
+				//if clicked at 'Show correct answer'
+				if (click==1){
+				//change the button text
+				b.innerHTML='Next';
+				//identify if it's the 1st or 2nd trial
+				counter1++;
+					if (counter1%2 == 0){
+					var n=1} else {var n=0}
+				//Display answer in the p node
+				p.innerHTML=answs[n];
+				}
+
+				//if clicked at 'Next'
+				if (click==0){
+				//change the button text
+				b.innerHTML='Show correct answer';
+				//identify if it's the 1st or 2nd trial
+				counter2++;
+				console.log(counter2)
+					if (counter1%2 == 0){
+					var n=1} else {var n=2}
+				//Change the source of the audio nodes
+				audios[0].src="audio/cue" + n + ".wav";
+				audios[1].src="audio/trial" + n + ".wav";
+				audios[2].src="audio/probe" + n + ".wav";
+				//No text in the p node
+				p.innerHTML="";
+				}
+				
+			}
+            </script>
+		
+			
+		</body>
+
+</html>
